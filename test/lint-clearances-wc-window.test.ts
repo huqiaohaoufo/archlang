@@ -31,6 +31,7 @@ const bath = (extra: string): string => `plan "Bath" {
 
 /** A 400 × 700 pan backed onto the north face whose centreline is `c` mm from the west face. */
 const wcAt = (c: number): string => `furniture wc at (${100 + c - 200},100) size 400x700`;
+const squatWcAt = (c: number): string => `furniture squat_wc at (${100 + c - 200},100) size 400x600`;
 
 const of = (src: string, code: string, opts: Parameters<typeof lint>[1] = {}) =>
   lint(src, opts).filter((d) => d.code === code);
@@ -51,6 +52,11 @@ describe("W_WC_SIDE_CLEARANCE: the figure comes from the ruleset", () => {
     expect(of(bath(wcAt(420)), WC)).toEqual([]);
     const [d] = of(bath(wcAt(420)), WC, { profile: "accessibility-advisory" });
     expect(d?.message).toContain("a WC needs 450 mm to each side (30 mm short)");
+  });
+
+  it("a squat WC uses the same side-clearance figure as a seated WC", () => {
+    expect(of(bath(squatWcAt(390)), WC)).toHaveLength(1);
+    expect(of(bath(squatWcAt(400)), WC)).toEqual([]);
   });
 
   it("`wcSideClearanceMm: null` turns the rule off", () => {
