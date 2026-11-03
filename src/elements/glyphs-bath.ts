@@ -1,6 +1,6 @@
 /**
- * Bathroom plan symbols: the WC, the basin, the shower tray, the tub, the bidet, the urinal and
- * the mirror.
+ * Bathroom plan symbols: the WC, the squat WC, the basin, the shower tray, the tub, the bidet,
+ * the urinal and the mirror.
  *
  * Every symbol is drawn in the visual-polish language the pilot `wc` set: the OUTLINE of a piece
  * in the `thin` pen (drawn in the derived symbol ink), every DETAIL inside it — a bowl's rim, a
@@ -8,7 +8,7 @@
  * `roundedRectPath`) wherever the real thing is round: a bowl is a four-centre oval and a tub's
  * foot end is an arc, not a 24-gon. The vocabulary, in the order a bathroom reads it:
  *
- * - **A hard carcass is `g.body`; a bowl, a tray floor or a seat is `g.basin`** (white). A drawn
+ * - **A hard carcass is `g.body`; a bowl, a pan, a tray floor or a seat is `g.basin`** (white). A drawn
  *   piece therefore reads from its lines alone in `mono`, where every tint is white.
  * - **Real closed-form geometry, every measure a fraction of the host footprint, no absolute
  *   millimetre anywhere.** That is what lets one symbol read at legend-swatch size and at 1:50
@@ -29,15 +29,15 @@
  * including the 1 x 10000 and 10000 x 1 rects the fuzz corpus feeds it. Pure and deterministic:
  * no clock, no randomness, no state; the curve builders are closed-form.
  *
- * Mirror symmetry: the `wc`, the `basin`, the `shower`, the `bidet` and the `urinal` are
- * symmetric about their centre line (`test/glyph-chirality.test.ts` holds a mirrored `wc` and
- * `shower` to the plain one's exact bytes). The `bathtub` is handed — its taps are at one end —
+ * Mirror symmetry: `wc`, `squat_wc`, `basin`, `shower`, `bidet` and `urinal` are symmetric
+ * about their centre line (`test/glyph-chirality.test.ts` holds mirrored fixtures to the plain
+ * one's exact bytes). The `bathtub` is handed — its taps are at one end —
  * and so is the `mirror`, whose reflection ticks all lean the same way.
  */
 
-import type { SceneNode } from "../scene.js";
+import type { PathEdge, PathLoop, SceneNode } from "../scene.js";
 import type { GlyphCtx, Rect } from "./glyph-lib.js";
-import { clamp, insetRect, ovalPath, rectPoly, roundedRectPath, shortSide } from "./glyph-lib.js";
+import { bulgeArc, clamp, insetRect, ovalPath, rectPoly, roundedRectPath, shortSide } from "./glyph-lib.js";
 
 /**
  * The WC: the cistern along the back with its flush button, the bowl in front of it, the seat
@@ -331,4 +331,95 @@ export function drawMirror(r: Rect, g: GlyphCtx): SceneNode[] {
     g.seg({ x: x - d, y: cy + d }, { x: x + d, y: cy - d }, "extraThin");
   }
   return g.nodes;
+}
+
+
+/**
+ * A floor-mounted squat WC: the ceramic rim, the tapered pan, its inner floor, the rear waste,
+ * and the two textured footrests.
+ *
+ * The broad end of the pan is the BACK, along the top edge of the footprint. The waste sits
+ * toward that end; the front narrows into a rounded nose. The two footrests remain outside the
+ * pan, one each side, with four short anti-slip grooves apiece.
+ *
+ * The pan is a true path: straight tapered sides and a circular front, not a tessellated
+ * polygon. Its widths are fractions of the host footprint, and the pan width is capped by
+ * both axes so even a degenerate legend probe stays inside its rectangle.
+ *
+ * Mirror-symmetric about the centre line. Prim count: 13.
+ */
+export function drawSquatWc(r: Rect, g: GlyphCtx): SceneNode[] {
+  const cx = r.x + r.w / 2;
+  const s = shortSide(r);
+
+  const shell: Rect = {
+    x: r.x + r.w * 0.05,
+    y: r.y + r.h * 0.035,
+    w: r.w * 0.9,
+    h: r.h * 0.93,
+  };
+  g.path(roundedRectPath(shell, shortSide(shell) * 0.045), g.body);
+
+  const panWidth = Math.min(r.w * 0.46, r.h * 0.42);
+  const frontWidth = panWidth * 0.74;
+  g.path(
+    squatPanPath(r, panWidth, frontWidth, r.y + r.h * 0.14, r.y + r.h * 0.8),
+    g.basin,
+  );
+  g.path(
+    squatPanPath(r, panWidth * 0.78, frontWidth * 0.78, r.y + r.h * 0.2, r.y + r.h * 0.75),
+    g.basin,
+    "extraThin",
+  );
+
+  const drain = { x: cx, y: r.y + r.h * 0.28 };
+  const drainRadius = Math.min(s * 0.04, panWidth * 0.08, r.h * 0.025);
+  g.ring(drain, drainRadius);
+  g.dot(drain, drainRadius * 0.38);
+
+  const grooveHalf = s * 0.035;
+  for (const side of [-1, 1] as const) {
+    const x = cx + side * r.w * 0.31;
+    for (let i = 0; i < 4; i++) {
+      const y = r.y + r.h * (0.38 + i * 0.085);
+      g.seg(
+        { x: x - side * grooveHalf, y: y + grooveHalf },
+        { x: x + side * grooveHalf, y: y - grooveHalf },
+        "extraThin",
+      );
+    }
+  }
+  return g.nodes;
+}
+
+/** A squat pan with a broad back, tapered sides and a semicircular front. */
+function squatPanPath(
+  r: Rect,
+  backWidth: number,
+  frontWidth: number,
+  backY: number,
+  frontY: number,
+): PathLoop {
+  const cx = r.x + r.w / 2;
+  const left = cx - backWidth / 2;
+  const right = cx + backWidth / 2;
+  const frontLeft = { x: cx - frontWidth / 2, y: frontY };
+  const frontRight = { x: cx + frontWidth / 2, y: frontY };
+  const corner = Math.min(backWidth * 0.12, shortSide(r) * 0.04, r.h * 0.04);
+  const start = { x: left + corner, y: backY };
+  const rightTop = { x: right, y: backY + corner };
+  const leftTop = { x: left, y: backY + corner };
+  const edges: PathEdge[] = [
+    { t: "line", to: { x: right - corner, y: backY } },
+    ...(corner > 0
+      ? [{ t: "arc" as const, to: rightTop, center: { x: right - corner, y: backY + corner }, r: corner, sweep: 1 as const }]
+      : [{ t: "line" as const, to: rightTop }]),
+    { t: "line", to: frontRight },
+    ...bulgeArc(frontRight, frontLeft, frontWidth / 2),
+    { t: "line", to: leftTop },
+    ...(corner > 0
+      ? [{ t: "arc" as const, to: start, center: { x: left + corner, y: backY + corner }, r: corner, sweep: 1 as const }]
+      : [{ t: "line" as const, to: start }]),
+  ];
+  return { start, edges };
 }

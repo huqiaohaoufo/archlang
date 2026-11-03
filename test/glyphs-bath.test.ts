@@ -10,7 +10,7 @@
  *    below takes a circle's FOUR extremes (not the two corners `furniture-rotate.test.ts`
  *    settles for), so a dot pushed off one edge cannot hide behind the other.
  * 2. **No text.** These are drawn symbols; a fixture's label is the caller's fallback path.
- *    A text prim here would double-label every WC on the sheet.
+ *    A text prim here would double-label every WC pan on the sheet.
  * 3. **Finite at any aspect ratio.** The fuzz corpus feeds footprints like 10000 x 1. Every
  *    measure is a fraction of `r.w`/`r.h` and every radius a fraction of `min(w, h)`, so
  *    "finite" is a consequence rather than a hope — but a stray division would land here.
@@ -41,6 +41,7 @@ import {
   drawBidet,
   drawMirror,
   drawShower,
+  drawSquatWc,
   drawUrinal,
   drawWc,
 } from "../src/elements/glyphs-bath.js";
@@ -60,6 +61,7 @@ const GLYPHS: readonly (readonly [string, Draw])[] = [
   ["bidet", drawBidet],
   ["urinal", drawUrinal],
   ["mirror", drawMirror],
+  ["squat_wc", drawSquatWc],
 ];
 
 /** Draw one glyph into a fresh context — the same call `fixtureGlyph` makes. */
@@ -101,6 +103,7 @@ const FOOTPRINTS: Record<string, Rect> = {
   // 900 x 50 is the catalogued footprint, and it is the point: a mirror has no depth, so
   // this is the one glyph in the file whose ordinary case is an 18:1 sliver.
   mirror: { x: 1000, y: 2000, w: 900, h: 50 },
+  squat_wc: { x: 1000, y: 2000, w: 400, h: 600 },
 };
 
 describe("glyphs-bath — the drawn content of each symbol", () => {
@@ -113,6 +116,7 @@ describe("glyphs-bath — the drawn content of each symbol", () => {
     bidet: 6, // bowl · rim · tap deck · tap · jet · waste
     urinal: 4, // bowl · rim · flush plate · waste
     mirror: 6, // glass · 5 reflection ticks
+    squat_wc: 13, // ceramic shell · pan · inner floor · waste ring · waste · 8 foot grooves
   };
 
   for (const [name, f] of GLYPHS) {
@@ -191,7 +195,7 @@ describe("glyphs-bath — mirror symmetry", () => {
     );
   };
 
-  it("the wc, basin, shower, bidet and urinal have a vertical mirror axis", () => {
+  it("the wc, squat WC, basin, shower, bidet and urinal have a vertical mirror axis", () => {
     for (const [name, f] of GLYPHS) {
       if (name === "bathtub" || name === "mirror") continue;
       expect(mirrorSymmetric(name, f), `${name} must stay mirror-symmetric`).toBe(true);
@@ -348,6 +352,7 @@ describe("glyphs-bath — through the compiler, at all four rotations", () => {
     bidet: "400x700",
     urinal: "400x350",
     mirror: "900x50",
+    squat_wc: "400x600",
   };
 
   for (const name of Object.keys(SIZES)) {
@@ -481,6 +486,27 @@ describe("glyphs-bath — the three symbols added in v1.32", () => {
     expect(ticks(400, 200)).toBe(3); // the floor — a legend swatch still gets a rhythm
     expect(ticks(10000, 0)).toBe(12); // a zero depth is the cap, not a division by zero
     expect(ticks(0, 0)).toBe(3); // and 0/0 is the floor, not a NaN loop bound
+  });
+});
+
+
+describe("glyphs-bath — the squat WC", () => {
+  it("has a tapered pan, a rear waste and two grooved footrests", () => {
+    const r = FOOTPRINTS.squat_wc!;
+    const nodes = draw(drawSquatWc, r);
+    const g = glyphCtx(theme, sizes);
+    expect(nodes[0]!.paint.fill).toBe(g.body);
+    expect(nodes[1]!.paint.fill).toBe(g.basin);
+    const pan = nodes[1]!.prim as Extract<SceneNode["prim"], { t: "path" }>;
+    const loop = pan.loops[0]!;
+    const backWidth = loop.edges[0]!.to.x - loop.start.x;
+    const frontRight = loop.edges[2]!.to;
+    const frontLeft = loop.edges[loop.edges.length - 3]!.to;
+    expect(frontRight.x - frontLeft.x).toBeLessThan(backWidth);
+    const circles = nodes.filter((n) => n.prim.t === "circle");
+    expect(circles).toHaveLength(2);
+    expect(circles[0]!.prim.t === "circle" ? circles[0]!.prim.center.y : 0).toBeLessThan(r.y + r.h / 2);
+    expect(nodes.filter((n) => n.prim.t === "line")).toHaveLength(8);
   });
 });
 

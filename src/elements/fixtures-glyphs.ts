@@ -25,7 +25,7 @@ import type { Theme } from "../theme.js";
 import { DEFAULT_THEME } from "../theme.js";
 import type { GlyphCtx, Rect } from "./glyph-lib.js";
 import { glyphCtx } from "./glyph-lib.js";
-import { drawBasin, drawBathtub, drawBidet, drawMirror, drawShower, drawUrinal, drawWc } from "./glyphs-bath.js";
+import { drawBasin, drawBathtub, drawBidet, drawMirror, drawShower, drawSquatWc, drawUrinal, drawWc } from "./glyphs-bath.js";
 import {
   drawBarCounter,
   drawCounter,
@@ -237,6 +237,8 @@ const FIXTURE_FAMILIES: readonly (readonly [string, ...string[]])[] = [
   ["locker"],
   ["pool_table"],
   ["treadmill"],
+  // A new fixture family stays at the end so existing legend order remains byte-stable.
+  ["squat_wc"],
 ];
 
 /**
@@ -510,6 +512,8 @@ export function fixtureGlyph(category: string, r: Rect, theme: Theme, sizes: Ren
       return drawPoolTable(r, g);
     case "treadmill":
       return drawTreadmill(r, g);
+    case "squat_wc":
+      return drawSquatWc(r, g);
     default:
       return null;
   }

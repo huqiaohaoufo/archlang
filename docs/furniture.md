@@ -119,7 +119,7 @@ furniture wardrobe against bed.right clear front 600
 
 ## The symbol catalogue
 
-Eighty-three families, a hundred and twenty-nine names with the aliases, and **every one of
+Eighty-four families, a hundred and thirty names with the aliases, and **every one of
 them draws**.
 The tables below are grouped by the room the pieces belong to.
 
@@ -129,7 +129,7 @@ Three columns need a word of explanation:
   `against wall` uses when you omit `size`. A dash means the kind has none, so `size` is
   required there.
 - **Facing** says what ArchLang will do about which way the piece points.
-  **Derived** means the symbol has an unmistakable back — a cistern, a tap, a nosing, a
+  **Derived** means the symbol has an unmistakable back — a cistern, a squat pan's broad wall end, a tap, a nosing, a
   headboard, a wardrobe's door line — so an anchor can derive the quarter-turn and
   [`W_FIXTURE_BACK_TO_ROOM`](error-codes.md) flags a piece against a wall that faces the
   wrong way. **Symmetric** means the symbol is drawn so that a quarter-turn changes
@@ -147,12 +147,17 @@ Three columns need a word of explanation:
 | Kind (and aliases) | Symbol | Footprint | Facing | Wall |
 |---|---|---|---|---|
 | `wc` · `toilet` | a rounded cistern across the back with its flush button, a four-centre **oval** bowl in front, the seat opening and two hinge ticks | 400 × 700 | derived | ✓ |
+| `squat_wc` | a rounded ceramic shell around a long pan, broad at the wall end and tapering to a rounded front, with the rear waste and four anti-slip grooves on each footrest | 400 × 600 | derived | ✓ |
 | `basin` · `lavatory` | a rounded vanity top with an inset four-centre **oval** bowl and its floor line, a tap and spout at the back and the waste — **two bowls** on a long enough slab | 600 × 450 | derived | ✓ |
 | `shower` | a rounded tray with its floor let into the rim, four falls running from the corners to the waste, and the waste — a ring with a disc in it | 900 × 900 | symmetric | ✓ |
 | `bathtub` · `tub` · `bath` | a rounded rim and an inset well whose **foot end is a near half-circle** and whose head end is nearly square, two taps on the head deck and the waste beside them | 1700 × 700 | derived | ✓ |
 | `bidet` | an oval bowl with its rim, a small tap deck standing on the bowl's rear edge with its tap and jet, and the waste — a `wc` with no cistern | 400 × 700 | derived | ✓ |
 | `urinal` | a **U** bowl run to the wall face — square at the back, a semicircle at the front — with its rim, the flush plate across its back and the waste | 400 × 350 | derived | ✓ |
 | `mirror` | the glass, with a run of 45° reflection ticks across it — one per four depths of length, three to twelve | 900 × 50 | derived | ✓ |
+
+`squat_wc` is a floor-mounted pan rather than a seat-and-cistern WC. Its broad end is the back,
+so the waste sits toward the wall; it serves the same WC role for `finish` and participates in WC
+clearance checks.
 
 The tub is deliberately **uneven** — a deep deck at the tap end, a shallow rim at the foot, and
 a well that is nearly square at one end and round at the other — so the drawing says which end

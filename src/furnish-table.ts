@@ -135,7 +135,8 @@ export const FURNISH_TABLE: Readonly<Partial<Record<UseKind, readonly FurnishIte
 export const familyOf = (word: string): string => canonicalFixture(word) ?? word;
 /**
  * The families a held piece does the job of: its own (`couch` is a `sofa`), and the one the
- * catalogue says it serves (`double_bed` serves `bed`, a bare `sink` serves `basin`).
+ * catalogue says it serves (`double_bed` serves `bed`, a `urinal` or `squat_wc` serves `wc`,
+ * a bare `sink` serves `basin`).
  */
 export const servedBy = (category: string): string[] => {
   const serves = fixtureSpec(category)?.serves;

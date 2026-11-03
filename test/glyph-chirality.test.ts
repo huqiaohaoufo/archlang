@@ -438,6 +438,7 @@ const HANDED_ON_MAIN: Readonly<Record<string, string>> = {
   locker: "... ... ... ... ... ... ...",
   pool_table: "... ... ... ... ... ... ...",
   treadmill: "... ... ... ... ... ... ...",
+  squat_wc: "... ... ... ... ... ... ...",
 };
 
 /**

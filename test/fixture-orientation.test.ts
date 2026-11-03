@@ -124,6 +124,11 @@ describe("backCandidateEdges — the footprint's aspect constrains the back", ()
     expect(backCandidateEdges({ w: 400, h: 700 }, defaultFootprint("wc"))).toEqual(["top", "bottom"]);
   });
 
+  it("keeps a 400x600 squat WC's back on a horizontal edge", () => {
+    expect(backCandidateEdges({ w: 400, h: 600 }, defaultFootprint("squat_wc"))).toEqual(["top", "bottom"]);
+    expect(backCandidateEdges({ w: 600, h: 400 }, defaultFootprint("squat_wc"))).toEqual(["left", "right"]);
+  });
+
   it("puts a 700x400 WC's back on a vertical edge (the depth axis is x)", () => {
     expect(backCandidateEdges({ w: 700, h: 400 }, defaultFootprint("wc"))).toEqual(["left", "right"]);
   });
@@ -159,6 +164,7 @@ describe("derived orientation for room-anchored placement", () => {
   it("edge anchor, wall present → back faces that wall", () => {
     expect(rotOf(boxed(`furniture wc in r anchor bottom size 400x700`))).toBe(180);
     expect(rotOf(boxed(`furniture wc in r anchor top size 400x700`))).toBe(0);
+    expect(rotOf(boxed(`furniture squat_wc in r anchor bottom size 400x600`))).toBe(180);
     // A vertical wall needs the piece's depth on x, i.e. a 700x400 footprint.
     expect(rotOf(boxed(`furniture wc in r anchor left size 700x400`))).toBe(270);
     expect(rotOf(boxed(`furniture wc in r anchor right size 700x400`))).toBe(90);

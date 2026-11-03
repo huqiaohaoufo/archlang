@@ -31,8 +31,11 @@ import type { RFurniture, RRoom, RWindow } from "../ir.js";
 import type { LintContext } from "./context.js";
 import { WALL_COLLISION_SLACK_MM } from "./measure.js";
 
-/** Is this category a WC (the `wc` family: `wc`, `toilet`)? */
-export const isWc = (category: string): boolean => canonicalFixture(category) === "wc";
+/** Is this category a WC pan (the seated `wc` family or the floor-mounted `squat_wc` family)? */
+export const isWc = (category: string): boolean => {
+  const family = canonicalFixture(category);
+  return family === "wc" || family === "squat_wc";
+};
 
 /** A counter, worktop or bar counter: standing across a cased opening, it is a servery hatch, which
  *  `W_DOORWAY_BLOCKED` does not read as blocking the opening (PS2.11e). */

@@ -287,6 +287,7 @@ suite("furnish law — fill only: a partly furnished room is reported, never top
       ["office", ["reception_desk in r_bed anchor center size 2400x900"]], // serves `desk`
       ["bath", ["wc against wall w_bb offset 600 in r_bed", "sink against wall w_bb offset 1600 in r_bed"]],
       ["wc", ["urinal against wall w_bb offset 600 in r_bed", "basin against wall w_bb offset 1600 in r_bed"]],
+      ["wc", ["squat_wc against wall w_bb offset 600 in r_bed", "basin against wall w_bb offset 1600 in r_bed"]],
     ] as const) {
       const src = holding(use, pieces);
       expect(errorsOf(src), pieces.join(" + ")).toEqual([]);

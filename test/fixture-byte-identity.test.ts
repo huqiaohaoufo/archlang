@@ -7,7 +7,7 @@
  * or counts of primitives would not catch what actually matters here, which is whether the
  * bytes a user's `arch compile` writes moved. So each case below pins the WHOLE document.
  *
- * The file has four groups, and they carry different promises.
+ * The file has five groups, and they carry different promises.
  *
  * ## Group 1 — PERMANENT. Later phases must not move these.
  *
@@ -41,6 +41,11 @@
  * tint, `pergola` is dashed all the
  * way round, `shed` mixes a filled carcass with a dashed ridge, and `bbq` is the one outdoor kind
  * with a catalogued footprint AND a frontal clearance. Re-blessable, and each diff read first.
+ *
+ * ## Group 5 — the squat WC, its first full-SVG pin.
+ *
+ * One plan at the new family's catalogued footprint. This pins the complete drawing, not only
+ * the primitive count or the shape's scene objects; future changes must be read as a full diff.
  */
 
 import { describe, expect, it } from "vitest";
@@ -641,6 +646,12 @@ describe("fixture symbols — the outdoor tranche (re-blessed when redrawn)", ()
   });
 });
 
+describe("fixture symbols — the squat WC (new full-SVG pin)", () => {
+  it("squat_wc", () => {
+    expect(svg("furniture squat_wc at (300,300) size 400x600")).toMatchInlineSnapshot();
+  });
+});
+
 /**
  * The inverse of the pin this block used to carry.
  *
@@ -657,15 +668,16 @@ describe("fixture symbols — the outdoor tranche (re-blessed when redrawn)", ()
  *
  * The second assertion pins the consequence authors actually see: a drawn symbol IGNORES its
  * `label`, so the word never reaches the SVG. That is long-standing behaviour for `wc` and
- * `basin` — it is new only in that nine more categories now reach it.
+ * `basin` — it is new only in that ten more categories now reach it.
  */
 describe("catalogued categories that now draw a symbol are NOT the labelled rectangle", () => {
-  const drawn = ["bed", "wardrobe", "sofa", "desk", "bookshelf", "washer", "dishwasher", "plant", "car"];
+  const drawn = ["bed", "wardrobe", "sofa", "desk", "bookshelf", "washer", "dishwasher", "plant", "car", "squat_wc"];
 
   for (const cat of drawn) {
     it(`${cat} draws its own symbol, not the fallback`, () => {
-      const asFixture = svg(`furniture ${cat} at (300,300) size 800x600 label "X"`);
-      const asUnknown = svg('furniture widget at (300,300) size 800x600 label "X"');
+      const size = cat === "squat_wc" ? "600x800" : "800x600";
+      const asFixture = svg(`furniture ${cat} at (300,300) size ${size} label "X"`);
+      const asUnknown = svg(`furniture widget at (300,300) size ${size} label "X"`);
       expect(asFixture).not.toBe(asUnknown);
       // The fallback is the only path that renders the label.
       expect(asUnknown).toContain(">X</text>");

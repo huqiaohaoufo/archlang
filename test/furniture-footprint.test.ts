@@ -29,6 +29,13 @@ describe("catalogued default footprints", () => {
     expect({ w: f!.size.w, h: f!.size.h }).toEqual({ w: 700, h: 400 });
   });
 
+  it("a wall-anchored squat WC uses its 400×600 footprint", () => {
+    const f = furnOf(plan(`furniture squat_wc against wall exterior segment 3 in r`));
+    expect(f).toBeDefined();
+    // Along=400 runs vertically; the 600 mm depth projects into the room.
+    expect({ w: f!.size.w, h: f!.size.h }).toEqual({ w: 600, h: 400 });
+  });
+
   it("an explicit size still overrides the catalog footprint", () => {
     const f = furnOf(plan(`furniture wc against wall exterior segment 3 size 500x800 in r`));
     // Wall-relative along=500, depth=800 → plan w=depth, h=along on a vertical wall.

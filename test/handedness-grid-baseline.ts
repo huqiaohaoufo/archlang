@@ -388,4 +388,5 @@ export const GRID_ON_MAIN: Readonly<Record<string, "all" | "none" | readonly str
   locker: "none",
   pool_table: "none",
   treadmill: "none",
+  squat_wc: "none",
 };

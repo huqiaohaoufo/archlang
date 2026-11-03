@@ -36,7 +36,7 @@ export interface FixtureSpec {
   zones?: readonly FixtureZone[];
   /**
    * The canonical category whose job this piece does in a room, beside its own family's: a
-   * `double_bed` serves `bed`, a `urinal` serves `wc`, a bare `sink` serves `basin`. Read
+   * `double_bed` serves `bed`, a `urinal` or `squat_wc` serves `wc`, a bare `sink` serves `basin`. Read
    * only by `finish`, to decide whether a room that holds furniture lacks a piece its use
    * requires (`src/furnish.ts`). Nothing draws, measures or lints it. The words of a family
    * carry the same value unless their `zones` differ (`sink` is wet as well as kitchen, so it
@@ -715,6 +715,15 @@ const CATALOG: Readonly<Record<string, FixtureSpec>> = Object.freeze({
     clearanceMm: 900,
     footprint: { along: 800, depth: 1800 },
   },
+  // A squat pan is a distinct WC family: its broad rear end faces the wall and its long axis is fixed.
+  squat_wc: {
+    requiresWall: true,
+    fixedAspect: true,
+    clearanceMm: 450,
+    footprint: { along: 400, depth: 600 },
+    zones: ["wet"],
+    serves: "wc",
+  },
 });
 
 /** All catalogued categories (aliases included), in declaration order. */
@@ -746,7 +755,7 @@ export function backsOntoWall(category: string): boolean {
 /**
  * Does which way this fixture faces mean anything? True for any symbol with a distinguishable
  * back — either because the piece needs a wall for services ({@link FixtureSpec.requiresWall}:
- * a WC's cistern, a basin's tap, a counter's nosing) or because the drawn symbol simply has a
+ * a seated WC's cistern, a squat WC's broad wall end, a basin's tap, a counter's nosing) or because the drawn symbol simply has a
  * front and a back worth aiming ({@link FixtureSpec.directional}: a bed's headboard, a
  * wardrobe's door line). These are the categories whose orientation can be derived, flagged
  * (`W_FIXTURE_BACK_TO_ROOM`) and corrected.

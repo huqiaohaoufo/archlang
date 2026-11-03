@@ -32,6 +32,7 @@ const room = (label: string, extra: string): string => `plan "WC" {
 
 /** A 400 × 700 pan backed onto the north face whose centreline is `c` mm from the west face. */
 const wcAt = (c: number): string => `furniture wc at (${100 + c - 200},100) size 400x700`;
+const squatWcAt = (c: number): string => `furniture squat_wc at (${100 + c - 200},100) size 400x600`;
 
 /** An example with one line swapped back to what it was before PR #305 (fc3f9d7). */
 function prefix(name: string, fixed: string, was: string): string {
@@ -110,6 +111,12 @@ describe("W_ACCESSIBLE_WC_SIDE_WALL: the band", () => {
     expect(d?.message).toBe(
       "The WC in Accessible WC has its centreline 501 mm from the nearer side wall; an accessible WC needs one within 500 mm, for a grab rail and a side transfer (1 mm too far).",
     );
+  });
+
+  it("a squat WC is measured by the same centreline-to-side-wall band", () => {
+    expect(of(room("Accessible WC", squatWcAt(500)))).toEqual([]);
+    const [d] = of(room("Accessible WC", squatWcAt(501)));
+    expect(d?.message).toContain("has its centreline 501 mm from the nearer side wall");
   });
 
   it("the nearer side wall decides: a pan 450 mm from the east face is clear", () => {

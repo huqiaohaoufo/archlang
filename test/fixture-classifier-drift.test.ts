@@ -26,13 +26,14 @@ describe("fixture classifier — single source", () => {
         "bath",
         "bathtub",
         "tub",
-        // All three are plumbed sanitary fixtures, so all three are a deliberate
-        // MEMBERSHIP change: a WC block whose only fixture is a urinal, or a utility room
-        // with a laundry tub in it, no longer raises `W_ROOM_NO_FIXTURE`. `water_heater`
+        // These are deliberate wet-zone additions: a WC block whose only fixture is a urinal
+        // or squat WC, or a utility room with a laundry tub in it, no longer raises
+        // `W_ROOM_NO_FIXTURE`. `water_heater`
         // and `mirror` are deliberately NOT here — a cupboard with a boiler in it is not a
         // bathroom, and a mirror over a console table is not one either.
         "bidet",
         "urinal",
+        "squat_wc",
         "laundry_sink",
         "laundry_tub",
       ].sort(),
