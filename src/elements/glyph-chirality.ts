@@ -57,7 +57,7 @@
  * round the same way; a value would have to sit within an ulp of `x.xxxx5 + 1e-7` to straddle
  * the new boundary, which no fraction-of-the-footprint arithmetic produces. Float noise from
  * the glyph layer's own `cos`/`sin` sits seven orders below the quantum, which is why an EXACT
- * comparison would call 63 of the 83 families handed and be useless.
+ * comparison would call 63 of the 84 families handed and be useless.
  *
  * Pure and deterministic: no clock, no randomness, no trig.
  */
